@@ -1,6 +1,7 @@
 const express = require('express');
 const partnerRouter = express.Router();
 const bodyParser = require('body-parser');
+const campsiteRouter = require('./campsiteRouter');
 
 partnerRouter.use(bodyParser.json());
 
@@ -43,3 +44,5 @@ partnerRouter.route('/:partnerId')
 .delete((req, res) => {
   res.end('Deleting all the partners');
 });
+
+module.exports = partnerRouter;
