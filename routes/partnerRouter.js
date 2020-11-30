@@ -1,48 +1,56 @@
 const express = require('express');
-const partnerRouter = express.Router();
-const bodyParser = require('body-parser');
-const campsiteRouter = require('./campsiteRouter');
+const Partner = require('../models/partner');
 
-partnerRouter.use(bodyParser.json());
+const partnerRouter = express.Router();
 
 partnerRouter.route('/')
-.all((req, res, next) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  next();
-})
-.get((req, res) => {
-  res.end('Will send all the partners to you');
-})
-.post((req, res) => {
-  res.end(`Will add the partner: ${req.body.name} with description: ${req.body.description}`);
-})
-.put((req, rest) => {
-  res.statusCode = 403;
-  res.end('PUT operation not supported on /partners');
-})
-.delete((req, res) => {
-  res.end('Deleting all the partners');
-});
+  .get((req, res) => {
+    res.end('Will send all the partners to you');
+  })
+  .post((req, res) => {
+    res.end(`Will add the partner: ${req.body.name} with description: ${req.body.description}`);
+  })
+  .put((req, rest) => {
+    res.statusCode = 403;
+    res.end('PUT operation not supported on /partners');
+  })
+  .delete((req, res) => {
+    res.end('Deleting all the partners');
+  });
 
 partnerRouter.route('/:partnerId')
-.all((req, res, next) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  next();
-})
-.get((req, res) => {
-  res.end(`Will send ${req.params.partnerId}'s details to you`);
+.get((req, res, next) => {
+  Campsite.findById(req.params.campsiteId)
+      .then(campsite => {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.json(campsite);
+      })
+      .catch(err => next(err));
 })
 .post((req, res) => {
-  res.end(`Will add the partner: ${req.params.partnerId}`);
-})
-.put((req, res) => {
   res.statusCode = 403;
-  res.end('PUT operation not supported on /partners');
+  res.end(`POST operation not supported on /campsites/${req.params.campsiteId}`);
 })
-.delete((req, res) => {
-  res.end('Deleting all the partners');
+.put((req, res, next) => {
+  Partner.findByIdAndUpdate(req.params.partnerId, {
+      $set: req.body
+  }, { new: true })
+      .then(partner => {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.json(partner);
+      })
+      .catch(err => next(err));
+})
+.delete((req, res, next) => {
+  Partner.findByIdAndDelete(req.params.partnerId)
+      .then(response => {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.json(response);
+      })
+      .catch(err => next(err));
 });
 
 module.exports = partnerRouter;
