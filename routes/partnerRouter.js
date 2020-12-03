@@ -4,19 +4,39 @@ const Partner = require('../models/partner');
 const partnerRouter = express.Router();
 
 partnerRouter.route('/')
-  .get((req, res) => {
-    res.end('Will send all the partners to you');
-  })
-  .post((req, res) => {
-    res.end(`Will add the partner: ${req.body.name} with description: ${req.body.description}`);
-  })
-  .put((req, rest) => {
-    res.statusCode = 403;
-    res.end('PUT operation not supported on /partners');
-  })
-  .delete((req, res) => {
-    res.end('Deleting all the partners');
-  });
+.get((req, res, next) => {
+  Partner.find()
+    .then(promotions => {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application');
+      res.json(promotions);
+    })
+    .catch(err => next(err));
+})
+.post((req, res, next) => {
+  Partner.create(req.body)
+    .then(promotion => {
+      console.log('Promotion Created', promotion);
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application');
+      res.json(promotion);
+    })
+    .catch(err => next(err));
+})
+.put((req, res) => {
+  res.statusCode = 403;
+  res.end('PUT operation not supported on /partner');
+})
+.delete((reg, res) => {
+  Partner.deleteMany()
+    .then(response => {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application');
+      res.json(response);
+    })
+    .catch(err => next(err));
+});
+
 
 partnerRouter.route('/:partnerId')
 .get((req, res, next) => {
