@@ -7,7 +7,14 @@ const router = express.Router();
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
+
+    if (req.user.admin) {
     res.send('respond with a resource');
+    }
+    else {
+        err = new err('You are not authorized to access these files');
+        return next();
+    }
 });
 
 router.post('/signup', (req, res) => {
